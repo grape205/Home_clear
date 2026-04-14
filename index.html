@@ -334,12 +334,13 @@ function handleCredential(resp){
   }
   const client=google.accounts.oauth2.initTokenClient({
     client_id:CLIENT_ID, scope:SCOPE,
+    prompt:'',
     callback(r){
       if(r.access_token){ accessToken=r.access_token; initApp(); }
       else showToast('登入失敗，請重試');
     }
   });
-  client.requestAccessToken();
+  client.requestAccessToken({prompt:''});
 }
 
 async function initApp(){
