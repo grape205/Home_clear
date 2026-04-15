@@ -4,104 +4,117 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>打掃管理</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f7f5f2;--surface:#fff;--border:#e4dfd8;--text:#2a2520;--muted:#9c9289;--accent:#3d7a63;--accent-light:#eaf2ee;}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 20px 12px;position:sticky;top:0;z-index:200}
-.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-h1{font-size:18px;font-weight:700}
-.uinfo{display:flex;align-items:center;gap:6px}
-.uinfo img{width:26px;height:26px;border-radius:50%;border:1px solid var(--border)}
-.uname{font-size:12px;color:var(--muted)}
-.abadge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
-.tabs{display:flex;gap:4px;overflow-x:auto}
-.tab{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--muted);font-family:inherit;white-space:nowrap;transition:all .2s}
-.tab.active{background:var(--accent);color:#fff}
-#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.lcard{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 28px;width:100%;max-width:320px;text-align:center;box-shadow:0 2px 16px rgba(0,0,0,.07)}
-.lcard .icon{font-size:56px;margin-bottom:16px}
-.lcard h2{font-size:22px;font-weight:700;margin-bottom:8px}
-.lcard p{color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:28px}
-.gbtn{width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;font-family:inherit;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--text)}
+:root{--bg:#f7f5f2;--sur:#fff;--brd:#e4dfd8;--txt:#2a2520;--mut:#9c9289;--acc:#3d7a63;--acl:#eaf2ee;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:60px}
+/* LOGIN */
+#LS{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.lc{background:var(--sur);border:1px solid var(--brd);border-radius:20px;padding:36px 28px;width:100%;max-width:320px;text-align:center}
+.lc .ic{font-size:52px;margin-bottom:14px}
+.lc h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.lc p{color:var(--mut);font-size:13px;line-height:1.7;margin-bottom:24px}
+.gbtn{width:100%;background:#fff;border:1px solid var(--brd);border-radius:10px;padding:12px;font-family:inherit;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--txt)}
 .gbtn img{width:18px}
-main{padding:16px;max-width:600px;margin:0 auto}
-.page{display:none}.page.active{display:block}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
-.prow{display:flex;justify-content:space-between;margin-bottom:10px}
-.plbl{font-size:13px;color:var(--muted)}.pcnt{font-size:13px;font-weight:700;color:var(--accent)}
-.barbg{height:8px;border-radius:20px;background:var(--border);overflow:hidden}
-.barfill{height:100%;border-radius:20px;background:var(--accent);transition:width .4s}
-.sec{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
-.tlist{display:flex;flex-direction:column;gap:5px}
-.ti{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;transition:opacity .15s}
-.ti.done{opacity:.4}.ti.done .tn{text-decoration:line-through}
-.chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.ti.done .chk{background:var(--accent);border-color:var(--accent)}
-.chk svg{display:none}.ti.done .chk svg{display:block}
+/* HEADER */
+#HD{background:var(--sur);border-bottom:1px solid var(--brd);padding:14px 16px 10px;position:sticky;top:0;z-index:100;display:none}
+.hr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+h1{font-size:17px;font-weight:700}
+.ui{display:flex;align-items:center;gap:5px}
+.ui img{width:24px;height:24px;border-radius:50%;border:1px solid var(--brd)}
+.un{font-size:11px;color:var(--mut)}
+.ab{background:var(--acc);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.tabs{display:flex;gap:3px;overflow-x:auto}
+.tab{padding:6px 13px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--mut);font-family:inherit;white-space:nowrap}
+.tab.on{background:var(--acc);color:#fff}
+/* MAIN */
+#MN{padding:14px;max-width:600px;margin:0 auto;display:none}
+.pg{display:none}.pg.on{display:block}
+/* CARD */
+.card{background:var(--sur);border:1px solid var(--brd);border-radius:13px;padding:15px;margin-bottom:11px}
+/* PROGRESS */
+.pr{display:flex;justify-content:space-between;margin-bottom:9px}
+.pl{font-size:13px;color:var(--mut)}.pc{font-size:13px;font-weight:700;color:var(--acc)}
+.bb{height:7px;border-radius:20px;background:var(--brd);overflow:hidden}
+.bf{height:100%;border-radius:20px;background:var(--acc);transition:width .4s}
+/* CHECKLIST */
+.sec{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:14px 0 7px}
+.tl{display:flex;flex-direction:column;gap:4px}
+.ti{background:var(--sur);border:1px solid var(--brd);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.ti.dn{opacity:.4}.ti.dn .tn{text-decoration:line-through}
+.ck{width:21px;height:21px;border-radius:6px;border:2px solid var(--brd);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ti.dn .ck{background:var(--acc);border-color:var(--acc)}
+.ck svg{display:none}.ti.dn .ck svg{display:block}
 .tn{font-size:14px;flex:1}
-.fb{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.fb{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap}
 .fb.weekly{background:#e8f3ee;color:#2d6e52}.fb.biweekly{background:#f3ece8;color:#7a5c3d}
 .fb.monthly{background:#e8eef3;color:#3d5f7a}.fb.quarterly{background:#f3e8f0;color:#7a3d6e}
 .fb.special{background:#fdf0ea;color:#c0602a}
-.fg{margin-bottom:14px}
-.fg>label,.fl{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
-input[type=date],input[type=text],textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none}
-input:focus,textarea:focus{border-color:var(--accent)}
-textarea{resize:none;height:72px;line-height:1.6}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#f0ece6;color:var(--text);cursor:pointer;border:1.5px solid transparent;user-select:none}
-.chip.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
-.photo-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.photo-col>label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
-.pzone{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--bg)}
-.pzone input{display:none}
-.pzone .pi{font-size:24px;margin-bottom:4px}.pzone .ph{font-size:11px;color:var(--muted)}
-.pthumb{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid var(--border)}
-.psz{font-size:10px;color:var(--muted);margin-top:3px;text-align:center}
-.btn{width:100%;border:none;border-radius:10px;padding:12px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer}
-.btnp{background:var(--accent);color:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}
-.fbar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;gap:8px;align-items:flex-end}
+/* FORM */
+.fg{margin-bottom:13px}
+.fg>label,.fl{font-size:11px;font-weight:600;color:var(--mut);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+input[type=date],input[type=text],textarea{width:100%;border:1px solid var(--brd);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;background:var(--bg);color:var(--txt);outline:none;-webkit-appearance:none}
+input:focus,textarea:focus{border-color:var(--acc)}
+textarea{resize:none;height:68px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;background:#f0ece6;color:var(--txt);cursor:pointer;border:1.5px solid transparent;user-select:none}
+.chip.on{background:var(--acl);border-color:var(--acc);color:var(--acc)}
+/* PHOTO */
+.phrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}
+.phcol>label{font-size:11px;font-weight:600;color:var(--mut);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+.pz{border:2px dashed var(--brd);border-radius:9px;padding:14px;text-align:center;cursor:pointer;background:var(--bg)}
+.pz input{display:none}
+.pz .pi{font-size:22px;margin-bottom:3px}.pz .ph{font-size:11px;color:var(--mut)}
+.pt{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:7px;margin-top:7px;border:1px solid var(--brd)}
+.ps{font-size:10px;color:var(--mut);margin-top:2px;text-align:center}
+/* BTN */
+.btn{width:100%;border:none;border-radius:9px;padding:12px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;background:var(--acc);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* HISTORY */
+.fbar{background:var(--sur);border:1px solid var(--brd);border-radius:11px;padding:11px;margin-bottom:11px;display:flex;gap:7px;align-items:flex-end}
 .fbar>div{flex:1}
-.fbtn{border:none;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
-.fclr{background:#f0ece6;color:var(--muted)}.fref{background:var(--accent);color:#fff}
-.rc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;animation:up .3s}
-@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.rh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.rdate{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--accent)}
-.remail{font-size:11px;color:var(--muted);margin-top:2px}
-.rcnt{font-size:11px;color:var(--muted);background:#f0ece6;padding:2px 8px;border-radius:20px;white-space:nowrap}
-.rphs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.fbtn{border:none;border-radius:7px;padding:9px 11px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.fcl{background:#f0ece6;color:var(--mut)}.frf{background:var(--acc);color:#fff}
+.rc{background:var(--sur);border:1px solid var(--brd);border-radius:13px;padding:13px 15px;margin-bottom:9px}
+.rh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
+.rd{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--acc)}
+.re{font-size:11px;color:var(--mut);margin-top:2px}
+.rcn{font-size:11px;color:var(--mut);background:#f0ece6;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.rphs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}
 .rphs.one{grid-template-columns:1fr}
-.rlbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.rph{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid var(--border);cursor:pointer;display:block}
-.rtags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
-.rtag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--accent-light);color:var(--accent);font-weight:500}
-.rnote{font-size:12px;color:var(--muted);padding-top:8px;margin-top:6px;border-top:1px solid var(--border)}
-.aitem{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.aname{flex:1;font-size:14px}
-.adel{background:#fdf0ea;color:#c0602a;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-.addrow{display:flex;gap:8px;margin-top:10px}
-.addrow input{flex:1}
-.addrow select{width:90px;border:1px solid var(--border);border-radius:8px;padding:10px 8px;font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#2a2520;color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;line-height:2}
-.spin{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:6px}
+.rlb{font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.rph{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:9px;border:1px solid var(--brd);cursor:pointer;display:block}
+.rtags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+.rtag{font-size:11px;padding:3px 8px;border-radius:20px;background:var(--acl);color:var(--acc);font-weight:500}
+.rnt{font-size:12px;color:var(--mut);padding-top:7px;margin-top:5px;border-top:1px solid var(--brd)}
+/* ADMIN */
+.ai{background:var(--sur);border:1px solid var(--brd);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.an{flex:1;font-size:14px}
+.adl{background:#fdf0ea;color:#c0602a;border:none;border-radius:6px;padding:5px 9px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.adr{display:flex;gap:7px;margin-top:9px}
+.adr input{flex:1}
+.adr select{width:85px;border:1px solid var(--brd);border-radius:8px;padding:9px 7px;font-family:inherit;font-size:13px;background:var(--bg);color:var(--txt);outline:none;-webkit-appearance:none}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#2a2520;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:36px 20px;color:var(--mut);font-size:14px;line-height:2}
+.sp{display:inline-block;width:16px;height:16px;border:2px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:5px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999;align-items:center;justify-content:center}
-.lb.open{display:flex}.lb img{max-width:94vw;max-height:90vh;border-radius:10px}
-.lbx{position:absolute;top:16px;right:20px;color:#fff;font-size:30px;cursor:pointer}
-.wtip{background:var(--accent-light);border-radius:8px;padding:8px 12px;font-size:12px;color:#2d6e52;margin-bottom:14px;line-height:1.5}
+.wtip{background:var(--acl);border-radius:7px;padding:7px 11px;font-size:12px;color:#2d6e52;margin-bottom:12px;line-height:1.5}
+/* LIGHTBOX */
+#LB{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9998;align-items:center;justify-content:center}
+#LB.on{display:flex}
+#LB img{max-width:92vw;max-height:86vh;border-radius:10px;pointer-events:none}
+#LBX{position:absolute;top:0;right:0;width:60px;height:60px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;cursor:pointer;z-index:9999}
 </style>
 </head>
 <body>
 
-<div id="loginScreen" style="position:fixed;inset:0;z-index:500;background:var(--bg)">
-  <div class="lcard">
-    <div class="icon">🧹</div>
+<div id="LS">
+  <div class="lc">
+    <div class="ic">🧹</div>
     <h2>打掃管理</h2>
     <p>登入 Google 帳號<br>開始管理打掃記錄</p>
     <button class="gbtn" onclick="startLogin()">
@@ -110,80 +123,79 @@ textarea{resize:none;height:72px;line-height:1.6}
   </div>
 </div>
 
-<header id="appHeader" style="display:none">
-  <div class="hrow">
+<header id="HD">
+  <div class="hr">
     <h1>🧹 打掃管理</h1>
-    <div class="uinfo">
-      <img id="uAvatar" src="" alt="">
-      <span class="uname" id="uName"></span>
-      <span class="abadge" id="aBadge" style="display:none">管理員</span>
+    <div class="ui">
+      <img id="uAv" src="" alt="">
+      <span class="un" id="uNm"></span>
+      <span class="ab" id="aB" style="display:none">管理員</span>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="go('checklist')">今日清單</button>
-    <button class="tab" onclick="go('record')">新增記錄</button>
-    <button class="tab" onclick="go('history')">歷史記錄</button>
-    <button class="tab" id="adminTab" style="display:none" onclick="go('admin')">⚙️ 管理</button>
+    <button class="tab on" onclick="go('cl')">今日清單</button>
+    <button class="tab" onclick="go('rc')">新增記錄</button>
+    <button class="tab" onclick="go('hi')">歷史記錄</button>
+    <button class="tab" id="adTab" style="display:none" onclick="go('ad')">⚙️ 管理</button>
   </div>
 </header>
 
-<main id="appMain" style="display:none">
-
-  <div id="page-checklist" class="page active">
+<main id="MN">
+  <div id="pg-cl" class="pg on">
     <div class="card">
-      <div class="prow"><span class="plbl">今日進度</span><span class="pcnt" id="progTxt">0/0</span></div>
-      <div class="barbg"><div class="barfill" id="progBar" style="width:0%"></div></div>
+      <div class="pr"><span class="pl">今日進度</span><span class="pc" id="pTx">0/0</span></div>
+      <div class="bb"><div class="bf" id="pBr" style="width:0%"></div></div>
     </div>
-    <div class="wtip" id="wtip"></div>
-    <div id="clBody"></div>
+    <div class="wtip" id="wTip"></div>
+    <div id="clBd"></div>
   </div>
 
-  <div id="page-record" class="page">
+  <div id="pg-rc" class="pg">
     <div class="card">
-      <div style="font-size:15px;font-weight:600;margin-bottom:16px">記錄這次打掃</div>
-      <div class="fg"><label>日期</label><input type="date" id="rDate"></div>
-      <div class="fg"><label>完成項目（可多選）</label><div class="chips" id="rChips"></div></div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:15px">記錄這次打掃</div>
+      <div class="fg"><label>日期</label><input type="date" id="rDt"></div>
+      <div class="fg"><label>完成項目（可多選）</label><div class="chips" id="rCh"></div></div>
       <div class="fg">
         <label>照片</label>
-        <div class="photo-row">
-          <div class="photo-col">
+        <div class="phrow">
+          <div class="phcol">
             <label>打掃前</label>
-            <div class="pzone" onclick="document.getElementById('pB').click()">
-              <input type="file" id="pB" accept="image/*" onchange="pickPhoto(event,'before')">
+            <div class="pz" onclick="document.getElementById('pB').click()">
+              <input type="file" id="pB" accept="image/*" onchange="pickPh(event,'b')">
               <div class="pi">📷</div><div class="ph">上傳前</div>
             </div>
-            <div id="prevB"></div>
+            <div id="pvB"></div>
           </div>
-          <div class="photo-col">
+          <div class="phcol">
             <label>打掃後</label>
-            <div class="pzone" onclick="document.getElementById('pA').click()">
-              <input type="file" id="pA" accept="image/*" onchange="pickPhoto(event,'after')">
+            <div class="pz" onclick="document.getElementById('pA').click()">
+              <input type="file" id="pA" accept="image/*" onchange="pickPh(event,'a')">
               <div class="pi">✨</div><div class="ph">上傳後</div>
             </div>
-            <div id="prevA"></div>
+            <div id="pvA"></div>
           </div>
         </div>
       </div>
-      <div class="fg"><label>備註</label><textarea id="rNote" placeholder="今天打掃了什麼、有什麼特別情況…"></textarea></div>
-      <button class="btn btnp" id="subBtn" onclick="submitRecord()">儲存記錄 ✓</button>
+      <div class="fg"><label>備註</label><textarea id="rNt" placeholder="今天打掃了什麼、特別情況…"></textarea></div>
+      <button class="btn" id="sBtn" onclick="doSave()">儲存記錄 ✓</button>
     </div>
   </div>
 
-  <div id="page-history" class="page">
+  <div id="pg-hi" class="pg">
     <div class="fbar">
-      <div><div class="fl">篩選日期</div><input type="date" id="fDate" onchange="applyFilter()"></div>
-      <button class="fbtn fclr" onclick="clearFilter()">清除</button>
-      <button class="fbtn fref" onclick="loadHistory()">↻</button>
+      <div><div class="fl">篩選日期</div><input type="date" id="fDt" onchange="applyF()"></div>
+      <button class="fbtn fcl" onclick="clearF()">清除</button>
+      <button class="fbtn frf" onclick="loadHi()">↻</button>
     </div>
-    <div id="histBody"><div class="empty"><span class="spin"></span>載入中…</div></div>
+    <div id="hiBd"><div class="empty"><span class="sp"></span>載入中…</div></div>
   </div>
 
-  <div id="page-admin" class="page">
+  <div id="pg-ad" class="pg">
     <div class="card">
-      <div style="font-size:15px;font-weight:600;margin-bottom:14px">新增打掃項目</div>
-      <div class="addrow">
-        <input type="text" id="newName" placeholder="項目名稱">
-        <select id="newFreq">
+      <div style="font-size:15px;font-weight:600;margin-bottom:13px">新增打掃項目</div>
+      <div class="adr">
+        <input type="text" id="nNm" placeholder="項目名稱">
+        <select id="nFq">
           <option value="weekly">每週</option>
           <option value="biweekly">每兩週</option>
           <option value="monthly">每月</option>
@@ -191,139 +203,125 @@ textarea{resize:none;height:72px;line-height:1.6}
           <option value="special">特殊</option>
         </select>
       </div>
-      <button class="btn btnp" style="margin-top:10px" onclick="addTask()">＋ 新增</button>
+      <button class="btn" style="margin-top:9px" onclick="addTask()">＋ 新增</button>
     </div>
     <div class="sec">所有項目</div>
-    <div id="adminBody"></div>
+    <div id="adBd"></div>
   </div>
-
 </main>
 
 <div class="toast" id="toast"></div>
-<div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
-  <span class="lbx">✕</span>
-  <img id="lbImg" src="">
+
+<div id="LB">
+  <div id="LBX" onclick="closeLb()">✕</div>
+  <img id="LBI" src="">
 </div>
 
 <script>
-const CLIENT_ID   = '34540517701-fc864a8slcr72uertdiv4g9pkkcdmpv7.apps.googleusercontent.com';
+const CID='34540517701-fc864a8slcr72uertdiv4g9pkkcdmpv7.apps.googleusercontent.com';
+const SID='13KScgeqXXq1lUfBlpeW6emwMy4_VjdxV4oddqLarAyQ';
+const ADM='grapecat205@gmail.com';
+const SC='https://www.googleapis.com/auth/spreadsheets';
+const FL={weekly:'每週',biweekly:'每兩週',monthly:'每月',quarterly:'每季',special:'特殊'};
+const S1=encodeURIComponent('工作表1');
+const S2='Sheet2';
 
-// Try to restore session silently on load
-window.addEventListener('load', ()=>{
-  // Wait for GSI to load then try silent token
-  setTimeout(()=>{
-    try{
-      const saved=JSON.parse(localStorage.getItem('lastUser')||'null');
-      if(saved && saved.email){
-        userEmail=saved.email;
-        document.getElementById('uAvatar').src=saved.avatar||'';
-        document.getElementById('uName').textContent=saved.name||saved.email;
-        isAdmin=userEmail===ADMIN_EMAIL;
-        if(isAdmin){document.getElementById('aBadge').style.display='inline';document.getElementById('adminTab').style.display='inline-block';}
-        // Try silent token refresh
-        const tc=google.accounts.oauth2.initTokenClient({
-          client_id:CLIENT_ID,scope:SCOPE,
-          callback(r){
-            if(r.access_token){
-              token=r.access_token;
-              clearInterval(window._tokenTimer);
-              window._tokenTimer=setInterval(()=>refreshToken(),50*60*1000);
-              boot();
-            }
-          }
-        });
-        tc.requestAccessToken({prompt:''});
-      }
-    }catch(e){}
-  }, 1000);
-});
+let tk='',isAdm=false,uEmail='',tasks=[],sel=new Set(),phs={b:null,a:null},rows=[];
+const TD=new Date().toISOString().slice(0,10);
+let ckd=JSON.parse(localStorage.getItem('ck')||'[]');
+if(localStorage.getItem('ckdt')!==TD){ckd=[];localStorage.setItem('ck','[]');localStorage.setItem('ckdt',TD);}
 
-const SHEET_ID    = '13KScgeqXXq1lUfBlpeW6emwMy4_VjdxV4oddqLarAyQ';
-const ADMIN_EMAIL = 'grapecat205@gmail.com';
-const SCOPE       = 'https://www.googleapis.com/auth/spreadsheets';
-const FL          = {weekly:'每週',biweekly:'每兩週',monthly:'每月',quarterly:'每季',special:'特殊'};
-
-let token='', isAdmin=false, userEmail='', tasks=[], sel=new Set(), photos={before:null,after:null}, allRows=[];
-const TODAY=new Date().toISOString().slice(0,10);
-let checked=JSON.parse(localStorage.getItem('ck')||'[]');
-if(localStorage.getItem('ckd')!==TODAY){checked=[];localStorage.setItem('ck','[]');localStorage.setItem('ckd',TODAY);}
-
-function wk(d){const dt=new Date(d);dt.setHours(0,0,0,0);dt.setDate(dt.getDate()+3-(dt.getDay()+6)%7);const w1=new Date(dt.getFullYear(),0,4);return 1+Math.round(((dt-w1)/86400000-3+(w1.getDay()+6)%7)/7);}
-function show(t){
+function wkn(d){const dt=new Date(d);dt.setHours(0,0,0,0);dt.setDate(dt.getDate()+3-(dt.getDay()+6)%7);const w1=new Date(dt.getFullYear(),0,4);return 1+Math.round(((dt-w1)/86400000-3+(w1.getDay()+6)%7)/7);}
+function showT(t){
   if(t.freq==='weekly'||t.freq==='special')return true;
-  const w=wk(new Date()),dom=new Date().getDate(),mo=new Date().getMonth();
+  const w=wkn(new Date()),dom=new Date().getDate(),mo=new Date().getMonth();
   if(t.freq==='biweekly')return w%2===0;
   if(t.freq==='monthly')return dom<=7;
   if(t.freq==='quarterly')return[0,3,6,9].includes(mo)&&dom<=7;
   return false;
 }
 
-let tokenClient=null;
-
+// ── Auth ──
+let tClient=null;
 function startLogin(){
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID,scope:SCOPE,
+  tClient=google.accounts.oauth2.initTokenClient({
+    client_id:CID,scope:SC,
     callback(r){
-      if(!r.access_token){toast('登入失敗，請重試');return;}
-      token=r.access_token;
-      // Token expires in ~1hr, refresh every 50min
-      clearInterval(window._tokenTimer);
-      window._tokenTimer=setInterval(()=>refreshToken(),50*60*1000);
-      if(!userEmail){
-        fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{'Authorization':'Bearer '+token}})
-          .then(r=>r.json()).then(info=>{
-            userEmail=info.email||'';
-            document.getElementById('uAvatar').src=info.picture||'';
-            document.getElementById('uName').textContent=info.name||info.email||'';
-            isAdmin=userEmail===ADMIN_EMAIL;
-            if(isAdmin){document.getElementById('aBadge').style.display='inline';document.getElementById('adminTab').style.display='inline-block';}
+      if(!r.access_token){toast('登入失敗');return;}
+      tk=r.access_token;
+      clearInterval(window._tr);
+      window._tr=setInterval(silentRefresh,48*60*1000);
+      if(!uEmail){
+        fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+tk}})
+          .then(r=>r.json()).then(u=>{
+            uEmail=u.email||'';
+            document.getElementById('uAv').src=u.picture||'';
+            document.getElementById('uNm').textContent=u.name||u.email||'';
+            isAdm=uEmail===ADM;
+            if(isAdm){document.getElementById('aB').style.display='inline';document.getElementById('adTab').style.display='inline-block';}
+            localStorage.setItem('uInfo',JSON.stringify({email:uEmail,name:u.name,pic:u.picture}));
             boot();
-          }).catch(()=>{userEmail='';boot();});
-      }
+          }).catch(()=>boot());
+      } else { boot(); }
     }
   });
-  tokenClient.requestAccessToken({prompt:'consent'});
+  tClient.requestAccessToken({prompt:'consent'});
 }
 
-function refreshToken(){
-  if(!tokenClient)return;
-  tokenClient.requestAccessToken({prompt:''});
+function silentRefresh(){
+  if(!tClient)return;
+  tClient=google.accounts.oauth2.initTokenClient({
+    client_id:CID,scope:SC,
+    callback(r){if(r.access_token)tk=r.access_token;}
+  });
+  tClient.requestAccessToken({prompt:''});
 }
 
-async function authFetch(url,opts={}){
-  if(!opts.headers)opts.headers={};
-  opts.headers['Authorization']='Bearer '+token;
-  let res=await fetch(url,opts);
-  if(res.status===401){
-    // Token expired, refresh and retry
-    await new Promise(resolve=>{
-      const tc=google.accounts.oauth2.initTokenClient({
-        client_id:CLIENT_ID,scope:SCOPE,
-        callback(r){if(r.access_token){token=r.access_token;}resolve();}
-      });
-      tc.requestAccessToken({prompt:''});
-    });
-    opts.headers['Authorization']='Bearer '+token;
-    res=await fetch(url,opts);
-  }
-  return res;
+async function af(url,opt={}){
+  if(!opt.headers)opt.headers={};
+  opt.headers.Authorization='Bearer '+tk;
+  const r=await fetch(url,opt);
+  if(r.status===401){await new Promise(res=>{const c=google.accounts.oauth2.initTokenClient({client_id:CID,scope:SC,callback(x){if(x.access_token)tk=x.access_token;res();}});c.requestAccessToken({prompt:''});});opt.headers.Authorization='Bearer '+tk;return fetch(url,opt);}
+  return r;
 }
 
 async function boot(){
-  const ls=document.getElementById('loginScreen');
+  const ls=document.getElementById('LS');
   ls.style.display='none';
-  ls.style.pointerEvents='none';
-  ls.style.visibility='hidden';
-  document.getElementById('appHeader').style.display='block';
-  document.getElementById('appMain').style.display='block';
-  document.getElementById('rDate').value=TODAY;
-  // Save login state
-  try{ localStorage.setItem('lastUser', JSON.stringify({email:userEmail, name:document.getElementById('uName').textContent, avatar:document.getElementById('uAvatar').src})); }catch(e){}
+  document.getElementById('HD').style.display='block';
+  document.getElementById('MN').style.display='block';
+  document.getElementById('rDt').value=TD;
   await loadTasks();
-  renderCL();renderChips();
+  renderCL();renderCh();
 }
 
-const DEFAULT=[
+// Try restore on load
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const u=JSON.parse(localStorage.getItem('uInfo')||'null');
+    if(!u)return;
+    uEmail=u.email||'';
+    document.getElementById('uAv').src=u.pic||'';
+    document.getElementById('uNm').textContent=u.name||u.email||'';
+    isAdm=uEmail===ADM;
+    if(isAdm){document.getElementById('aB').style.display='inline';document.getElementById('adTab').style.display='inline-block';}
+    tClient=google.accounts.oauth2.initTokenClient({
+      client_id:CID,scope:SC,
+      callback(r){
+        if(r.access_token){
+          tk=r.access_token;
+          clearInterval(window._tr);
+          window._tr=setInterval(silentRefresh,48*60*1000);
+          boot();
+        }
+      }
+    });
+    tClient.requestAccessToken({prompt:''});
+  },800);
+});
+
+// ── Tasks ──
+const DEF=[
   {id:'t0',name:'房間空氣清新機',freq:'biweekly'},{id:'t1',name:'房間地板掃拖',freq:'weekly'},
   {id:'t2',name:'更換床單（除塵先處理）',freq:'weekly'},{id:'t3',name:'鏟貓屎',freq:'weekly'},
   {id:'t4',name:'客廳地板掃拖',freq:'weekly'},{id:'t5',name:'清三機垃圾',freq:'biweekly'},
@@ -333,202 +331,152 @@ const DEFAULT=[
   {id:'t15',name:'貓砂墊清洗',freq:'biweekly'},{id:'t16',name:'貓砂盆清洗',freq:'quarterly'},
   {id:'t17',name:'彈簧床套置換',freq:'quarterly'},{id:'t12',name:'前後陽台細清',freq:'monthly'},
 ];
-
 async function loadTasks(){
-  try{
-    const r=await authFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet2!A1:C200`);
-    const d=await r.json();
-    const rows=(d.values||[]).filter(r=>r[0]&&r[1]&&r[2]);
-    tasks=rows.length?rows.map(r=>({id:r[0],name:r[1],freq:r[2]})):[...DEFAULT];
-    if(!rows.length)await saveTasks();
-  }catch(e){tasks=[...DEFAULT];}
+  try{const r=await af(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${S2}!A1:C200`);const d=await r.json();const rw=(d.values||[]).filter(x=>x[0]&&x[1]&&x[2]);tasks=rw.length?rw.map(x=>({id:x[0],name:x[1],freq:x[2]})):[...DEF];if(!rw.length)await saveTasks();}
+  catch(e){tasks=[...DEF];}
 }
-
 async function saveTasks(){
-  await authFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet2!A1:C${tasks.length}?valueInputOption=USER_ENTERED`,{
-    method:'PUT',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({values:tasks.map(t=>[t.id,t.name,t.freq])})
-  });
+  await af(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${S2}!A1:C${tasks.length}?valueInputOption=USER_ENTERED`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:tasks.map(t=>[t.id,t.name,t.freq])})});
 }
 
+// ── Checklist ──
 function renderCL(){
-  const w=wk(new Date());
-  document.getElementById('wtip').textContent=`第 ${w} 週｜${w%2===0?'本週需做「每兩週」項目':'下週才做「每兩週」項目'}`;
+  const w=wkn(new Date());
+  document.getElementById('wTip').textContent=`第${w}週｜${w%2===0?'本週需做「每兩週」項目':'下週才做「每兩週」項目'}`;
   const g={weekly:[],biweekly:[],monthly:[],quarterly:[],special:[]};
-  tasks.forEach(t=>{if(show(t))g[t.freq]?.push(t);});
+  tasks.forEach(t=>{if(showT(t))g[t.freq]?.push(t);});
   const ord=[['weekly','每週例行'],['biweekly','每兩週加做'],['special','本週特殊'],['monthly','每月加做'],['quarterly','每季加做']];
   let html='';
-  ord.forEach(([f,lbl])=>{
+  ord.forEach(([f,lb])=>{
     if(!g[f]?.length)return;
-    html+=`<div class="sec">${lbl}</div><div class="tlist">`;
+    html+=`<div class="sec">${lb}</div><div class="tl">`;
     g[f].forEach(t=>{
-      const d=checked.includes(t.id);
-      html+=`<div class="ti${d?' done':''}" onclick="toggle('${t.id}')"><div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="tn">${t.name}</span><span class="fb ${f}">${FL[f]}</span></div>`;
+      const dn=ckd.includes(t.id);
+      html+=`<div class="ti${dn?' dn':''}" onclick="tog('${t.id}')"><div class="ck"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="tn">${t.name}</span><span class="fb ${f}">${FL[f]}</span></div>`;
     });
     html+='</div>';
   });
-  document.getElementById('clBody').innerHTML=html||'<div class="empty">今日沒有待辦項目</div>';
-  const vis=tasks.filter(t=>show(t));
-  const done=checked.filter(id=>vis.some(t=>t.id===id)).length;
-  document.getElementById('progTxt').textContent=`${done}/${vis.length}`;
-  document.getElementById('progBar').style.width=`${vis.length?Math.round(done/vis.length*100):0}%`;
+  document.getElementById('clBd').innerHTML=html||'<div class="empty">今日沒有待辦項目</div>';
+  const vis=tasks.filter(t=>showT(t));
+  const dn=ckd.filter(id=>vis.some(t=>t.id===id)).length;
+  document.getElementById('pTx').textContent=`${dn}/${vis.length}`;
+  document.getElementById('pBr').style.width=`${vis.length?Math.round(dn/vis.length*100):0}%`;
+}
+function tog(id){ckd.includes(id)?ckd=ckd.filter(x=>x!==id):ckd.push(id);localStorage.setItem('ck',JSON.stringify(ckd));renderCL();}
+
+// ── Chips ──
+function renderCh(){
+  const el=document.getElementById('rCh');el.innerHTML='';
+  tasks.forEach(t=>{const d=document.createElement('div');d.className='chip'+(sel.has(t.id)?' on':'');d.textContent=t.name;d.onclick=()=>{sel.has(t.id)?sel.delete(t.id):sel.add(t.id);renderCh();};el.appendChild(d);});
 }
 
-function toggle(id){
-  checked.includes(id)?checked=checked.filter(x=>x!==id):checked.push(id);
-  localStorage.setItem('ck',JSON.stringify(checked));
-  renderCL();
-}
-
-function renderChips(){
-  const el=document.getElementById('rChips');el.innerHTML='';
-  tasks.forEach(t=>{
-    const d=document.createElement('div');
-    d.className='chip'+(sel.has(t.id)?' on':'');
-    d.textContent=t.name;
-    d.onclick=()=>{sel.has(t.id)?sel.delete(t.id):sel.add(t.id);renderChips();};
-    el.appendChild(d);
-  });
-}
-
-function pickPhoto(e,type){
+// ── Photos ──
+function pickPh(e,type){
   const file=e.target.files[0];if(!file)return;
-  const img=new Image(),reader=new FileReader();
-  reader.onload=ev=>{
+  const img=new Image(),rd=new FileReader();
+  rd.onload=ev=>{
     img.onload=()=>{
-      // Compress to max 800px, quality 0.7 to fit in Sheets cell
-      const MAX=800;let w=img.width,h=img.height;
+      let MAX=800,w=img.width,h=img.height;
       if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
-      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
-      cv.getContext('2d').drawImage(img,0,0,w,h);
-      let b64=cv.toDataURL('image/jpeg',0.7);
-      // If still too large (>40KB), compress more
-      if(b64.length>55000){
-        const cv2=document.createElement('canvas');
-        const MAX2=500;let w2=w,h2=h;
-        if(w2>MAX2||h2>MAX2){if(w2>h2){h2=Math.round(h2*MAX2/w2);w2=MAX2;}else{w2=Math.round(w2*MAX2/h2);h2=MAX2;}}
-        cv2.width=w2;cv2.height=h2;
-        cv2.getContext('2d').drawImage(img,0,0,w2,h2);
-        b64=cv2.toDataURL('image/jpeg',0.65);
-        w=w2;h=h2;
-      }
-      photos[type]=b64;
-      const kb=Math.round(b64.length*0.75/1024);
-      const pid=type==='before'?'prevB':'prevA';
-      document.getElementById(pid).innerHTML=`<img class="pthumb" src="${b64}"><div class="psz">${w}×${h} · ${kb}KB</div>`;
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+      let b=cv.toDataURL('image/jpeg',.7);
+      if(b.length>50000){MAX=500;if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}const cv2=document.createElement('canvas');cv2.width=w;cv2.height=h;cv2.getContext('2d').drawImage(img,0,0,w,h);b=cv2.toDataURL('image/jpeg',.65);}
+      phs[type]=b;
+      const kb=Math.round(b.length*.75/1024);
+      document.getElementById(type==='b'?'pvB':'pvA').innerHTML=`<img class="pt" src="${b}"><div class="ps">${w}×${h} · ${kb}KB</div>`;
+    };img.src=ev.target.result;
+  };rd.readAsDataURL(file);
 }
 
-async function submitRecord(){
-  const date=document.getElementById('rDate').value;
-  const note=document.getElementById('rNote').value.trim();
+// ── Save ──
+async function doSave(){
+  const date=document.getElementById('rDt').value;
+  const note=document.getElementById('rNt').value.trim();
   if(!date){toast('請選擇日期');return;}
-  if(sel.size===0){toast('請選擇至少一個打掃項目');return;}
-  const btn=document.getElementById('subBtn');
+  if(sel.size===0){toast('請選擇打掃項目');return;}
+  const btn=document.getElementById('sBtn');
   btn.disabled=true;btn.textContent='儲存中…';
   try{
     const names=[...sel].map(id=>tasks.find(t=>t.id===id)?.name||'').filter(Boolean).join('、');
-    const row=[[date,userEmail,names,note,photos.before||'',photos.after||'',new Date().toLocaleString('zh-TW')]];
-    const res=await authFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/%E5%B7%A5%E4%BD%9C%E8%A1%A81!A1:append?valueInputOption=USER_ENTERED`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({values:row})
-    });
-    if(!res.ok)throw new Error();
-    toast('✅ 記錄已儲存！');
-    sel.clear();photos={before:null,after:null};
-    ['prevB','prevA'].forEach(id=>document.getElementById(id).innerHTML='');
-    document.getElementById('rNote').value='';
+    const row=[[date,uEmail,names,note,phs.b||'',phs.a||'',new Date().toLocaleString('zh-TW')]];
+    const url=`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${S1}!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+    const res=await af(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:row})});
+    const js=await res.json();
+    if(js.error){toast('❌ '+js.error.message);return;}
+    toast('✅ 已儲存！');
+    sel.clear();phs={b:null,a:null};
+    ['pvB','pvA'].forEach(id=>document.getElementById(id).innerHTML='');
+    document.getElementById('rNt').value='';
     ['pB','pA'].forEach(id=>document.getElementById(id).value='');
-    renderChips();
-    setTimeout(()=>{go('history');loadHistory();},800);
-  }catch(e){console.error('Submit error:',e);toast('❌ 儲存失敗：'+e.message);}
+    renderCh();
+    setTimeout(()=>{go('hi');loadHi();},700);
+  }catch(e){toast('❌ 失敗：'+e.message);}
   btn.disabled=false;btn.textContent='儲存記錄 ✓';
 }
 
-async function loadHistory(){
-  const el=document.getElementById('histBody');
-  el.innerHTML='<div class="empty"><span class="spin"></span>載入中…</div>';
+// ── History ──
+async function loadHi(){
+  const el=document.getElementById('hiBd');
+  el.innerHTML='<div class="empty"><span class="sp"></span>載入中…</div>';
   try{
-    const res=await authFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/%E5%B7%A5%E4%BD%9C%E8%A1%A81!A1:G500`);
-    const data=await res.json();
-    allRows=(data.values||[]).filter(r=>r[0]&&/\d{4}-\d{2}-\d{2}/.test(r[0]));
-    renderHistory(allRows);
-  }catch(e){el.innerHTML='<div class="empty">載入失敗，請點 ↻ 重試</div>';}
+    const res=await af(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${S1}!A1:G500`);
+    const d=await res.json();
+    rows=(d.values||[]).filter(r=>r[0]&&/\d{4}-\d{2}-\d{2}/.test(r[0]));
+    renderHi(rows);
+  }catch(e){el.innerHTML='<div class="empty">載入失敗，請點 ↻</div>';}
 }
-
-function applyFilter(){
-  const d=document.getElementById('fDate').value;
-  renderHistory(d?allRows.filter(r=>r[0]===d):allRows);
-}
-
-function clearFilter(){
-  document.getElementById('fDate').value='';
-  renderHistory(allRows);
-}
-
-function renderHistory(rows){
-  const el=document.getElementById('histBody');
-  if(!rows.length){el.innerHTML='<div class="empty">沒有符合的記錄</div>';return;}
+function applyF(){const d=document.getElementById('fDt').value;renderHi(d?rows.filter(r=>r[0]===d):rows);}
+function clearF(){document.getElementById('fDt').value='';renderHi(rows);}
+function renderHi(data){
+  const el=document.getElementById('hiBd');
+  if(!data.length){el.innerHTML='<div class="empty">沒有符合的記錄</div>';return;}
   el.innerHTML='';
-  [...rows].reverse().forEach(r=>{
-    const[date,email,ts,note,b4,af]=r;
+  [...data].reverse().forEach(r=>{
+    const[dt,em,ts,nt,b4,af2]=r;
     const tags=(ts||'').split('、').filter(Boolean);
     const hB=b4&&b4.startsWith('data:image');
-    const hA=af&&af.startsWith('data:image');
+    const hA=af2&&af2.startsWith('data:image');
     let ph='';
     if(hB||hA){
       ph=`<div class="rphs${hB&&hA?'':' one'}">`;
-      if(hB)ph+=`<div><div class="rlbl">打掃前</div><img class="rph" src="${b4}" onclick="openLb(this.src)"></div>`;
-      if(hA)ph+=`<div><div class="rlbl">打掃後</div><img class="rph" src="${af}" onclick="openLb(this.src)"></div>`;
+      if(hB)ph+=`<div><div class="rlb">打掃前</div><img class="rph" src="${b4}" onclick="openLb(this.src)"></div>`;
+      if(hA)ph+=`<div><div class="rlb">打掃後</div><img class="rph" src="${af2}" onclick="openLb(this.src)"></div>`;
       ph+='</div>';
     }
-    const card=document.createElement('div');card.className='rc';
-    card.innerHTML=`<div class="rh"><div><div class="rdate">${date}</div>${email?`<div class="remail">${email}</div>`:''}</div><div class="rcnt">${tags.length} 項完成</div></div>${ph}<div class="rtags">${tags.map(n=>`<span class="rtag">${n}</span>`).join('')}</div>${note?`<div class="rnote">📝 ${note}</div>`:''}`;
-    el.appendChild(card);
+    const c=document.createElement('div');c.className='rc';
+    c.innerHTML=`<div class="rh"><div><div class="rd">${dt}</div>${em?`<div class="re">${em}</div>`:''}</div><div class="rcn">${tags.length} 項完成</div></div>${ph}<div class="rtags">${tags.map(n=>`<span class="rtag">${n}</span>`).join('')}</div>${nt?`<div class="rnt">📝 ${nt}</div>`:''}`;
+    el.appendChild(c);
   });
 }
 
-function renderAdmin(){
-  const el=document.getElementById('adminBody');el.innerHTML='';
-  tasks.forEach((t,i)=>{
-    const d=document.createElement('div');d.className='aitem';
-    d.innerHTML=`<span class="aname">${t.name}</span><span class="fb ${t.freq}">${FL[t.freq]}</span><button class="adel" onclick="delTask(${i})">刪除</button>`;
-    el.appendChild(d);
-  });
+// ── Admin ──
+function renderAd(){
+  const el=document.getElementById('adBd');el.innerHTML='';
+  tasks.forEach((t,i)=>{const d=document.createElement('div');d.className='ai';d.innerHTML=`<span class="an">${t.name}</span><span class="fb ${t.freq}">${FL[t.freq]}</span><button class="adl" onclick="delT(${i})">刪除</button>`;el.appendChild(d);});
 }
-
 async function addTask(){
-  const name=document.getElementById('newName').value.trim();
-  const freq=document.getElementById('newFreq').value;
-  if(!name){toast('請輸入項目名稱');return;}
-  tasks.push({id:'t'+Date.now(),name,freq});
-  await saveTasks();
-  document.getElementById('newName').value='';
-  renderAdmin();renderCL();renderChips();
-  toast('✅ 已新增：'+name);
+  const nm=document.getElementById('nNm').value.trim(),fq=document.getElementById('nFq').value;
+  if(!nm){toast('請輸入名稱');return;}
+  tasks.push({id:'t'+Date.now(),name:nm,freq:fq});
+  await saveTasks();document.getElementById('nNm').value='';
+  renderAd();renderCL();renderCh();toast('✅ 已新增');
 }
+async function delT(i){const nm=tasks[i].name;tasks.splice(i,1);await saveTasks();renderAd();renderCL();renderCh();toast('已刪除：'+nm);}
 
-async function delTask(i){
-  const name=tasks[i].name;tasks.splice(i,1);
-  await saveTasks();
-  renderAdmin();renderCL();renderChips();
-  toast('已刪除：'+name);
-}
-
+// ── Nav ──
 function go(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['checklist','record','history','admin'][i]===tab));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+tab).classList.add('active');
-  if(tab==='history')loadHistory();
-  if(tab==='admin')renderAdmin();
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['cl','rc','hi','ad'][i]===tab));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+tab).classList.add('on');
+  if(tab==='hi')loadHi();
+  if(tab==='ad')renderAd();
 }
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function openLb(src){document.getElementById('lbImg').src=src;document.getElementById('lb').classList.add('open');}
-function closeLb(){document.getElementById('lb').classList.remove('open');}
+// ── Helpers ──
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+function openLb(src){document.getElementById('LBI').src=src;document.getElementById('LB').classList.add('on');}
+function closeLb(){document.getElementById('LB').classList.remove('on');document.getElementById('LBI').src='';}
+document.getElementById('LB').addEventListener('click',function(e){if(e.target===this)closeLb();});
 </script>
 </body>
 </html>
