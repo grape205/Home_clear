@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打掃管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f5f2;--surface:#fff;--border:#e4dfd8;--text:#2a2520;--muted:#9c9289;
+  --accent:#3d7a63;--accent-light:#eaf2ee;--warn:#c0602a;--warn-light:#fdf0ea;
+  --shadow:0 2px 16px rgba(0,0,0,.07);
+}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 20px 14px;position:sticky;top:0;z-index:200;display:none}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:19px;font-weight:700}
+.user-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.user-pill img{width:24px;height:24px;border-radius:50%;border:1px solid var(--border)}
+.admin-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px}
+.tab{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;background:none;color:var(--muted);transition:all .2s;font-family:'Noto Sans TC',sans-serif;white-space:nowrap;flex-shrink:0}
+.tab.active{background:var(--accent);color:#fff}
+
+/* LOGIN */
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;padding:32px 20px;text-align:center}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px 24px;width:100%;max-width:340px;box-shadow:var(--shadow)}
+.login-icon{font-size:52px;margin-bottom:16px}
+.login-card h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.login-card p{color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:28px}
+
+main{padding:16px;max-width:600px;margin:0 auto;display:none}
+.page{display:none}.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:14px}
+
+/* PROGRESS */
+.progress-row{display:flex;justify-content:space-between;margin-bottom:10px}
+.progress-label{font-size:13px;color:var(--muted)}
+.progress-count{font-size:13px;font-weight:700;color:var(--accent)}
+.bar-bg{height:8px;border-radius:20px;background:var(--border);overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;background:var(--accent);transition:width .5s ease}
+
+/* SECTION */
+.section-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.task-list{display:flex;flex-direction:column;gap:5px}
+.task-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;user-select:none}
+.task-item:active{transform:scale(.98)}
+.task-item.done{opacity:.45}
+.task-item.done .task-name{text-decoration:line-through;color:var(--muted)}
+.checkbox{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.task-item.done .checkbox{background:var(--accent);border-color:var(--accent)}
+.check-svg{display:none}.task-item.done .check-svg{display:block}
+.task-name{font-size:14px;flex:1}
+.freq-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.freq-badge.weekly{background:#e8f3ee;color:#2d6e52}
+.freq-badge.biweekly{background:#f3ece8;color:#7a5c3d}
+.freq-badge.monthly{background:#e8eef3;color:#3d5f7a}
+.freq-badge.quarterly{background:#f3e8f0;color:#7a3d6e}
+.freq-badge.special{background:#fdf0ea;color:#c0602a}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-group label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase}
+input[type=date],input[type=text],textarea,select{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Noto Sans TC',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:none;height:72px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#f0ece6;color:var(--text);cursor:pointer;border:1.5px solid transparent;transition:all .15s;user-select:none}
+.chip.selected{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+
+/* PHOTO */
+.photo-zone{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.photo-zone:hover{border-color:var(--accent);background:var(--accent-light)}
+.photo-zone input{display:none}
+.photo-zone .icon{font-size:26px;margin-bottom:4px}
+.photo-zone .hint{font-size:12px;color:var(--muted)}
+.photo-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.photo-thumb{width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;position:relative}
+.photo-row{display:flex;gap:10px}
+.photo-col{flex:1}
+.photo-col label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase}
+
+/* BUTTONS */
+.btn{width:100%;border:none;border-radius:10px;padding:12px;font-family:'Noto Sans TC',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-warn{background:var(--warn);color:#fff}
+.btn:active{opacity:.85}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sm{padding:6px 14px;font-size:12px;border-radius:8px;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-weight:600;transition:opacity .2s}
+.btn-sm:active{opacity:.8}
+
+/* RECORDS */
+.record-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.record-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.record-date{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--accent)}
+.record-count{font-size:11px;color:var(--muted);background:#f0ece6;padding:2px 8px;border-radius:20px}
+.record-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.record-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--accent-light);color:var(--accent);font-weight:500}
+.record-note{font-size:12px;color:var(--muted);padding-top:8px;margin-top:6px;border-top:1px solid var(--border)}
+.record-photos{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.record-photo{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer}
+.photo-label{font-size:10px;color:var(--muted);text-align:center;margin-top:3px}
+
+/* ADMIN */
+.admin-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.admin-item-name{flex:1;font-size:14px}
+.admin-item-freq{font-size:11px;color:var(--muted)}
+.btn-delete{background:#fdf0ea;color:var(--warn);border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row input{flex:1}
+.add-row select{width:100px;flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#2a2520;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:36px 20px;color:var(--muted);font-size:14px;line-height:2}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:94vw;max-height:90vh;border-radius:10px}
+.lightbox-close{position:absolute;top:16px;right:20px;color:#fff;font-size:28px;cursor:pointer;z-index:1000}
+
+/* LOADING */
+.loading{text-align:center;padding:30px;color:var(--muted);font-size:14px}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.week-info{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:var(--accent-light);border-radius:8px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-icon">🧹</div>
+    <h2>打掃管理</h2>
+    <p>登入 Google 帳號<br>開始管理打掃記錄</p>
+    <button class="btn btn-primary" onclick="startLogin()" style="width:280px;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#333;border:1px solid #ddd;font-size:15px">
+      <img src="https://www.google.com/favicon.ico" width="18"> 使用 Google 帳戶登入
+    </button>
+  </div>
+</div>
+
+<header id="appHeader">
+  <div class="header-row">
+    <h1>🧹 打掃管理</h1>
+    <div class="user-pill">
+      <img id="userAvatar" src="" alt="">
+      <span id="userName"></span>
+      <span class="admin-badge" id="adminBadge" style="display:none">管理員</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('checklist')">今日清單</button>
+    <button class="tab" onclick="switchTab('record')">新增記錄</button>
+    <button class="tab" onclick="switchTab('history')">歷史記錄</button>
+    <button class="tab" id="adminTab" style="display:none" onclick="switchTab('admin')">⚙️ 管理</button>
+  </div>
+</header>
+
+<main id="appMain">
+
+  <!-- 今日清單 -->
+  <div id="page-checklist" class="page active">
+    <div class="card">
+      <div class="progress-row">
+        <span class="progress-label">今日進度</span>
+        <span class="progress-count" id="progressText">0 / 0</span>
+      </div>
+      <div class="bar-bg"><div class="bar-fill" id="progressBar" style="width:0%"></div></div>
+    </div>
+    <div id="weekInfo" class="week-info"></div>
+    <div id="checklistContent"></div>
+  </div>
+
+  <!-- 新增記錄 -->
+  <div id="page-record" class="page">
+    <div class="card">
+      <h3>記錄這次打掃</h3>
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="recordDate">
+      </div>
+      <div class="form-group">
+        <label>完成項目（可多選）</label>
+        <div class="chips" id="taskChips"></div>
+      </div>
+      <div class="form-group">
+        <label>照片</label>
+        <div class="photo-row">
+          <div class="photo-col">
+            <label>打掃前</label>
+            <div class="photo-zone" onclick="document.getElementById('photoBefore').click()">
+              <input type="file" id="photoBefore" accept="image/*" onchange="handlePhoto(event,'before')">
+              <div class="icon">📷</div>
+              <div class="hint">上傳前</div>
+            </div>
+            <div id="previewBefore"></div>
+          </div>
+          <div class="photo-col">
+            <label>打掃後</label>
+            <div class="photo-zone" onclick="document.getElementById('photoAfter').click()">
+              <input type="file" id="photoAfter" accept="image/*" onchange="handlePhoto(event,'after')">
+              <div class="icon">✨</div>
+              <div class="hint">上傳後</div>
+            </div>
+            <div id="previewAfter"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>備註</label>
+        <textarea id="recordNote" placeholder="今天打掃了什麼、有什麼特別情況…"></textarea>
+      </div>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitRecord()">儲存記錄 ✓</button>
+    </div>
+  </div>
+
+  <!-- 歷史記錄 -->
+  <div id="page-history" class="page">
+    <div class="section-title">打掃記錄</div>
+    <div id="recordList"><div class="loading"><span class="spinner"></span>載入中…</div></div>
+  </div>
+
+  <!-- 管理員 -->
+  <div id="page-admin" class="page">
+    <div class="card">
+      <h3>新增打掃項目</h3>
+      <div class="add-row">
+        <input type="text" id="newTaskName" placeholder="項目名稱">
+        <select id="newTaskFreq">
+          <option value="weekly">每週</option>
+          <option value="biweekly">每兩週</option>
+          <option value="monthly">每月</option>
+          <option value="quarterly">每季</option>
+          <option value="special">特殊</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="addTask()">新增項目</button>
+    </div>
+    <div class="section-title">目前所有項目</div>
+    <div id="adminTaskList"></div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">✕</span>
+  <img id="lightboxImg" src="">
+</div>
+
+<script>
+const CLIENT_ID   = '34540517701-fc864a8slcr72uertdiv4g9pkkcdmpv7.apps.googleusercontent.com';
+const SHEET_ID    = '13KScgeqXXq1lUfBlpeW6emwMy4_VjdxV4oddqLarAyQ';
+const ADMIN_EMAIL = 'grapecat205@gmail.com';
+const SCOPE       = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
+const FREQ_LABEL  = {weekly:'每週',biweekly:'每兩週',monthly:'每月',quarterly:'每季',special:'特殊'};
+
+let accessToken = null;
+let isAdmin     = false;
+let userEmail   = '';
+let allTasks    = [];
+let selectedChips = new Set();
+let photoFiles  = {before: null, after: null};
+let photoB64    = {before: null, after: null};
+
+const today     = new Date().toISOString().slice(0,10);
+let checkedToday = JSON.parse(localStorage.getItem('checkedToday')||'[]');
+if(localStorage.getItem('lastDate') !== today){ checkedToday=[]; localStorage.setItem('checkedToday','[]'); localStorage.setItem('lastDate',today); }
+
+// Default tasks
+const DEFAULT_TASKS = [
+  {id:'t0',  name:'房間空氣清新機',       freq:'biweekly'},
+  {id:'t1',  name:'房間地板掃拖',         freq:'weekly'},
+  {id:'t2',  name:'更換床單（除塵先處理）',freq:'weekly'},
+  {id:'t3',  name:'鏟貓屎',               freq:'weekly'},
+  {id:'t4',  name:'客廳地板掃拖',         freq:'weekly'},
+  {id:'t5',  name:'清三機垃圾',           freq:'biweekly'},
+  {id:'t6',  name:'浴室細清',             freq:'monthly'},
+  {id:'t7',  name:'浴室加強',             freq:'weekly'},
+  {id:'t8',  name:'廚房細清',             freq:'monthly'},
+  {id:'t9',  name:'廚房加強',             freq:'weekly'},
+  {id:'t10', name:'房間床底下',           freq:'monthly'},
+  {id:'t14', name:'更換被單',             freq:'monthly'},
+  {id:'t15', name:'貓砂墊清洗',           freq:'biweekly'},
+  {id:'t16', name:'貓砂盆清洗',           freq:'quarterly'},
+  {id:'t17', name:'彈簧床套置換',         freq:'quarterly'},
+  {id:'t12', name:'前後陽台細清',         freq:'monthly'},
+];
+
+// Week number helper
+function getWeekNumber(d){ const date=new Date(d); date.setHours(0,0,0,0); date.setDate(date.getDate()+3-(date.getDay()+6)%7); const week1=new Date(date.getFullYear(),0,4); return 1+Math.round(((date-week1)/86400000-3+(week1.getDay()+6)%7)/7); }
+
+// Should task show this week?
+function shouldShowTask(task){
+  if(task.freq==='weekly') return true;
+  if(task.freq==='special') return true;
+  const wk = getWeekNumber(new Date());
+  if(task.freq==='biweekly') return wk%2===0;
+  if(task.freq==='monthly'){
+    const d=new Date(); const dom=d.getDate();
+    return dom<=7; // Show monthly tasks in first week
+  }
+  if(task.freq==='quarterly'){
+    const m=new Date().getMonth();
+    return [0,3,6,9].includes(m) && new Date().getDate()<=7;
+  }
+  return true;
+}
+
+// ── Auth ──
+function startLogin(){
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPE,
+    callback(r){
+      if(r.access_token){
+        accessToken = r.access_token;
+        // Get user info
+        fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers:{'Authorization':'Bearer '+r.access_token}
+        }).then(res=>res.json()).then(info=>{
+          userEmail = info.email||'';
+          document.getElementById('userAvatar').src = info.picture||'';
+          document.getElementById('userName').textContent = info.name||info.email||'';
+          initApp();
+        }).catch(()=>{ userEmail=''; initApp(); });
+      } else {
+        showToast('登入失敗，請重試');
+      }
+    }
+  });
+  client.requestAccessToken({prompt:'consent'});
+}
+
+async function initApp(){
+  isAdmin = (userEmail===ADMIN_EMAIL);
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appHeader').style.display='block';
+  document.getElementById('appMain').style.display='block';
+  document.getElementById('recordDate').value=today;
+  if(isAdmin){
+    document.getElementById('adminBadge').style.display='inline';
+    document.getElementById('adminTab').style.display='inline-block';
+  }
+  await loadTasksFromSheet();
+  renderChecklist();
+  renderChips();
+}
+
+// ── Load tasks from sheet (Sheet2) ──
+async function loadTasksFromSheet(){
+  try{
+    const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet2!A1:C100`,{
+      headers:{'Authorization':'Bearer '+accessToken}
+    });
+    const data=await res.json();
+    const rows=data.values||[];
+    if(rows.length>0){
+      allTasks=rows.map(r=>({id:r[0],name:r[1],freq:r[2]})).filter(t=>t.id&&t.name&&t.freq);
+    } else {
+      allTasks=[...DEFAULT_TASKS];
+      await saveTasksToSheet();
+    }
+  } catch(e){
+    allTasks=[...DEFAULT_TASKS];
+  }
+}
+
+async function saveTasksToSheet(){
+  const values=allTasks.map(t=>[t.id,t.name,t.freq]);
+  await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet2!A1:C${values.length}?valueInputOption=USER_ENTERED`,{
+    method:'PUT',
+    headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+    body:JSON.stringify({values})
+  });
+}
+
+// ── Checklist ──
+function renderChecklist(){
+  const wk=getWeekNumber(new Date());
+  document.getElementById('weekInfo').textContent=`第 ${wk} 週｜雙數週加做「每兩週」項目，每月第一週加做「每月」項目`;
+  const groups={weekly:[],biweekly:[],monthly:[],quarterly:[],special:[]};
+  allTasks.forEach(t=>{ if(shouldShowTask(t)) groups[t.freq]?.push(t); });
+  let html='';
+  const order=[['weekly','每週例行'],['biweekly','每兩週'],['special','本週特殊'],['monthly','每月'],['quarterly','每季']];
+  order.forEach(([freq,label])=>{
+    const list=groups[freq];
+    if(!list||list.length===0) return;
+    html+=`<div class="section-title">${label}</div><div class="task-list">`;
+    list.forEach(t=>{
+      const done=checkedToday.includes(t.id);
+      html+=`<div class="task-item${done?' done':''}" onclick="toggleTask('${t.id}')">
+        <div class="checkbox"><svg class="check-svg" width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="task-name">${t.name}</span>
+        <span class="freq-badge ${freq}">${FREQ_LABEL[freq]}</span>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('checklistContent').innerHTML=html||'<div class="empty">今日沒有待辦項目</div>';
+  updateProgress(groups);
+}
+
+function updateProgress(groups){
+  const visible=allTasks.filter(t=>shouldShowTask(t));
+  const done=checkedToday.filter(id=>visible.some(t=>t.id===id)).length;
+  const total=visible.length;
+  document.getElementById('progressText').textContent=`${done} / ${total}`;
+  document.getElementById('progressBar').style.width=`${total?Math.round(done/total*100):0}%`;
+}
+
+function toggleTask(id){
+  checkedToday.includes(id)?checkedToday=checkedToday.filter(x=>x!==id):checkedToday.push(id);
+  localStorage.setItem('checkedToday',JSON.stringify(checkedToday));
+  renderChecklist();
+}
+
+// ── Chips ──
+function renderChips(){
+  const el=document.getElementById('taskChips'); el.innerHTML='';
+  allTasks.forEach(t=>{
+    const c=document.createElement('div');
+    c.className='chip'+(selectedChips.has(t.id)?' selected':'');
+    c.textContent=t.name;
+    c.onclick=()=>{ selectedChips.has(t.id)?selectedChips.delete(t.id):selectedChips.add(t.id); renderChips(); };
+    el.appendChild(c);
+  });
+}
+
+// ── Photos ──
+function handlePhoto(e, type){
+  const file=e.target.files[0]; if(!file) return;
+  photoFiles[type]=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    photoB64[type]=ev.target.result;
+    const preview=document.getElementById('preview'+type.charAt(0).toUpperCase()+type.slice(1));
+    preview.innerHTML=`<img src="${ev.target.result}" style="width:100%;border-radius:8px;margin-top:8px;border:1px solid var(--border)">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadPhotoToDrive(file, filename){
+  if(!file) return null;
+  const meta={name:filename,mimeType:file.type};
+  const form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify(meta)],{type:'application/json'}));
+  form.append('file',file);
+  const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink,webContentLink',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+accessToken},
+    body:form
+  });
+  const data=await res.json();
+  if(data.id){
+    // Make public readable
+    await fetch(`https://www.googleapis.com/drive/v3/files/${data.id}/permissions`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({role:'reader',type:'anyone'})
+    });
+    return `https://drive.google.com/uc?id=${data.id}`;
+  }
+  return null;
+}
+
+// ── Submit ──
+async function submitRecord(){
+  const date=document.getElementById('recordDate').value;
+  const note=document.getElementById('recordNote').value.trim();
+  if(!date||selectedChips.size===0){showToast('請選擇日期和打掃項目');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='上傳中…';
+  try{
+    const taskNames=[...selectedChips].map(id=>allTasks.find(t=>t.id===id)?.name||'').filter(Boolean).join('、');
+    let beforeUrl='', afterUrl='';
+    if(photoFiles.before){
+      btn.textContent='上傳前照…';
+      beforeUrl=await uploadPhotoToDrive(photoFiles.before,`before_${date}_${Date.now()}.jpg`)||'';
+    }
+    if(photoFiles.after){
+      btn.textContent='上傳後照…';
+      afterUrl=await uploadPhotoToDrive(photoFiles.after,`after_${date}_${Date.now()}.jpg`)||'';
+    }
+    btn.textContent='儲存記錄…';
+    const row=[[date, userEmail, taskNames, note, beforeUrl, afterUrl, new Date().toLocaleString('zh-TW')]];
+    const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/%E5%B7%A5%E4%BD%9C%E8%A1%A81!A1:G1:append?valueInputOption=USER_ENTERED`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({values:row})
+    });
+    if(!res.ok) throw new Error();
+    showToast('✅ 記錄已儲存！');
+    selectedChips.clear(); photoFiles={before:null,after:null}; photoB64={before:null,after:null};
+    document.getElementById('previewBefore').innerHTML='';
+    document.getElementById('previewAfter').innerHTML='';
+    document.getElementById('recordNote').value='';
+    document.getElementById('photoBefore').value='';
+    document.getElementById('photoAfter').value='';
+    renderChips();
+    setTimeout(()=>{switchTab('history');loadRecords();},900);
+  } catch(e){
+    showToast('❌ 儲存失敗，請重試');
+  }
+  btn.disabled=false; btn.textContent='儲存記錄 ✓';
+}
+
+// ── Records ──
+async function loadRecords(){
+  const el=document.getElementById('recordList');
+  el.innerHTML='<div class="loading"><span class="spinner"></span>載入中…</div>';
+  try{
+    const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/%E5%B7%A5%E4%BD%9C%E8%A1%A81!A1:G500`,{
+      headers:{'Authorization':'Bearer '+accessToken}
+    });
+    const data=await res.json();
+    const rows=(data.values||[]).filter(r=>r[0]&&/\d{4}-\d{2}-\d{2}/.test(r[0]));
+    if(!rows.length){el.innerHTML='<div class="empty">還沒有記錄<br>打掃完記得記錄！</div>';return;}
+    el.innerHTML='';
+    [...rows].reverse().forEach(r=>{
+      const [date,email,tasks,note,beforeUrl,afterUrl]=r;
+      const tags=(tasks||'').split('、').filter(Boolean);
+      const card=document.createElement('div');
+      card.className='record-card';
+      let photosHtml='';
+      if(beforeUrl||afterUrl){
+        photosHtml='<div class="record-photos">';
+        if(beforeUrl) photosHtml+=`<div><img class="record-photo" src="${beforeUrl}" onclick="openLightbox('${beforeUrl}')" onerror="this.style.display='none'"><div class="photo-label">打掃前</div></div>`;
+        if(afterUrl)  photosHtml+=`<div><img class="record-photo" src="${afterUrl}" onclick="openLightbox('${afterUrl}')" onerror="this.style.display='none'"><div class="photo-label">打掃後</div></div>`;
+        photosHtml+='</div>';
+      }
+      const emailDisplay = email ? `<span style="font-size:11px;color:var(--muted);margin-left:6px">${email}</span>` : '';
+      card.innerHTML=`
+        <div class="record-header">
+          <div><span class="record-date">${date}</span>${emailDisplay}</div>
+          <span class="record-count">${tags.length} 項</span>
+        </div>
+        <div class="record-tags">${tags.map(n=>`<span class="record-tag">${n}</span>`).join('')}</div>
+        ${photosHtml}
+        ${note?`<div class="record-note">📝 ${note}</div>`:''}`;
+      el.appendChild(card);
+    });
+  } catch(e){
+    el.innerHTML='<div class="empty">載入失敗，請重新整理</div>';
+  }
+}
+
+// ── Admin ──
+function renderAdminTasks(){
+  const el=document.getElementById('adminTaskList'); el.innerHTML='';
+  allTasks.forEach((t,i)=>{
+    const div=document.createElement('div');
+    div.className='admin-item';
+    div.innerHTML=`<span class="admin-item-name">${t.name}</span><span class="admin-item-freq freq-badge ${t.freq}">${FREQ_LABEL[t.freq]}</span><button class="btn-delete" onclick="deleteTask(${i})">刪除</button>`;
+    el.appendChild(div);
+  });
+}
+
+async function addTask(){
+  const name=document.getElementById('newTaskName').value.trim();
+  const freq=document.getElementById('newTaskFreq').value;
+  if(!name){showToast('請輸入項目名稱');return;}
+  const id='t'+Date.now();
+  allTasks.push({id,name,freq});
+  await saveTasksToSheet();
+  document.getElementById('newTaskName').value='';
+  renderAdminTasks(); renderChecklist(); renderChips();
+  showToast('✅ 已新增：'+name);
+}
+
+async function deleteTask(idx){
+  const name=allTasks[idx].name;
+  allTasks.splice(idx,1);
+  await saveTasksToSheet();
+  renderAdminTasks(); renderChecklist(); renderChips();
+  showToast('已刪除：'+name);
+}
+
+// ── Helpers ──
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const tabs=['checklist','record','history','admin'];
+  const idx=tabs.indexOf(tab);
+  document.querySelectorAll('.tab')[idx]?.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  if(tab==='history') loadRecords();
+  if(tab==='admin') renderAdminTasks();
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function openLightbox(src){ document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
+</script>
+</body>
+</html>
