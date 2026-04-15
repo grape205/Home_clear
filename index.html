@@ -99,7 +99,7 @@ textarea{resize:none;height:72px;line-height:1.6}
 </head>
 <body>
 
-<div id="loginScreen">
+<div id="loginScreen" style="position:fixed;inset:0;z-index:500;background:var(--bg)">
   <div class="lcard">
     <div class="icon">🧹</div>
     <h2>打掃管理</h2>
@@ -207,6 +207,37 @@ textarea{resize:none;height:72px;line-height:1.6}
 
 <script>
 const CLIENT_ID   = '34540517701-fc864a8slcr72uertdiv4g9pkkcdmpv7.apps.googleusercontent.com';
+
+// Try to restore session silently on load
+window.addEventListener('load', ()=>{
+  // Wait for GSI to load then try silent token
+  setTimeout(()=>{
+    try{
+      const saved=JSON.parse(localStorage.getItem('lastUser')||'null');
+      if(saved && saved.email){
+        userEmail=saved.email;
+        document.getElementById('uAvatar').src=saved.avatar||'';
+        document.getElementById('uName').textContent=saved.name||saved.email;
+        isAdmin=userEmail===ADMIN_EMAIL;
+        if(isAdmin){document.getElementById('aBadge').style.display='inline';document.getElementById('adminTab').style.display='inline-block';}
+        // Try silent token refresh
+        const tc=google.accounts.oauth2.initTokenClient({
+          client_id:CLIENT_ID,scope:SCOPE,
+          callback(r){
+            if(r.access_token){
+              token=r.access_token;
+              clearInterval(window._tokenTimer);
+              window._tokenTimer=setInterval(()=>refreshToken(),50*60*1000);
+              boot();
+            }
+          }
+        });
+        tc.requestAccessToken({prompt:''});
+      }
+    }catch(e){}
+  }, 1000);
+});
+
 const SHEET_ID    = '13KScgeqXXq1lUfBlpeW6emwMy4_VjdxV4oddqLarAyQ';
 const ADMIN_EMAIL = 'grapecat205@gmail.com';
 const SCOPE       = 'https://www.googleapis.com/auth/spreadsheets';
@@ -279,10 +310,15 @@ async function authFetch(url,opts={}){
 }
 
 async function boot(){
-  document.getElementById('loginScreen').style.display='none';
+  const ls=document.getElementById('loginScreen');
+  ls.style.display='none';
+  ls.style.pointerEvents='none';
+  ls.style.visibility='hidden';
   document.getElementById('appHeader').style.display='block';
   document.getElementById('appMain').style.display='block';
   document.getElementById('rDate').value=TODAY;
+  // Save login state
+  try{ localStorage.setItem('lastUser', JSON.stringify({email:userEmail, name:document.getElementById('uName').textContent, avatar:document.getElementById('uAvatar').src})); }catch(e){}
   await loadTasks();
   renderCL();renderChips();
 }
@@ -360,11 +396,22 @@ function pickPhoto(e,type){
   const img=new Image(),reader=new FileReader();
   reader.onload=ev=>{
     img.onload=()=>{
-      const MAX=1200;let w=img.width,h=img.height;
+      // Compress to max 800px, quality 0.7 to fit in Sheets cell
+      const MAX=800;let w=img.width,h=img.height;
       if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
       const cv=document.createElement('canvas');cv.width=w;cv.height=h;
       cv.getContext('2d').drawImage(img,0,0,w,h);
-      const b64=cv.toDataURL('image/jpeg',0.82);
+      let b64=cv.toDataURL('image/jpeg',0.7);
+      // If still too large (>40KB), compress more
+      if(b64.length>55000){
+        const cv2=document.createElement('canvas');
+        const MAX2=500;let w2=w,h2=h;
+        if(w2>MAX2||h2>MAX2){if(w2>h2){h2=Math.round(h2*MAX2/w2);w2=MAX2;}else{w2=Math.round(w2*MAX2/h2);h2=MAX2;}}
+        cv2.width=w2;cv2.height=h2;
+        cv2.getContext('2d').drawImage(img,0,0,w2,h2);
+        b64=cv2.toDataURL('image/jpeg',0.65);
+        w=w2;h=h2;
+      }
       photos[type]=b64;
       const kb=Math.round(b64.length*0.75/1024);
       const pid=type==='before'?'prevB':'prevA';
@@ -378,7 +425,8 @@ function pickPhoto(e,type){
 async function submitRecord(){
   const date=document.getElementById('rDate').value;
   const note=document.getElementById('rNote').value.trim();
-  if(!date||sel.size===0){toast('請選擇日期和打掃項目');return;}
+  if(!date){toast('請選擇日期');return;}
+  if(sel.size===0){toast('請選擇至少一個打掃項目');return;}
   const btn=document.getElementById('subBtn');
   btn.disabled=true;btn.textContent='儲存中…';
   try{
@@ -396,7 +444,7 @@ async function submitRecord(){
     ['pB','pA'].forEach(id=>document.getElementById(id).value='');
     renderChips();
     setTimeout(()=>{go('history');loadHistory();},800);
-  }catch(e){toast('❌ 儲存失敗，請重試');}
+  }catch(e){console.error('Submit error:',e);toast('❌ 儲存失敗：'+e.message);}
   btn.disabled=false;btn.textContent='儲存記錄 ✓';
 }
 
